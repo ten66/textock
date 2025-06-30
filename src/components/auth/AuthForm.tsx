@@ -18,7 +18,16 @@ interface AuthFormProps {
 export function AuthForm({ mode, onToggle }: AuthFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { signIn, signUp } = useAuth();
+
+  const handleToggle = () => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      onToggle();
+      setIsTransitioning(false);
+    }, 150);
+  };
 
   const {
     register,
@@ -55,12 +64,12 @@ export function AuthForm({ mode, onToggle }: AuthFormProps) {
 
       <div className="relative w-full max-w-md">
         {/* Main Card */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/20 p-8 relative overflow-hidden">
+        <div className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/20 p-8 relative overflow-hidden transition-all duration-300 ${isTransitioning ? 'scale-95 opacity-75' : 'scale-100 opacity-100'}`}>
           {/* Card decoration */}
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
           
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className={`text-center mb-8 transition-all duration-300 ${isTransitioning ? 'translate-y-2 opacity-0' : 'translate-y-0 opacity-100'}`}>
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mb-6 shadow-lg">
               <div className="text-3xl font-bold text-white">T</div>
             </div>
@@ -76,7 +85,7 @@ export function AuthForm({ mode, onToggle }: AuthFormProps) {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className={`space-y-6 transition-all duration-300 ${isTransitioning ? 'translate-y-2 opacity-0' : 'translate-y-0 opacity-100'}`}>
             <Input
               label="メールアドレス"
               type="email"
@@ -126,7 +135,7 @@ export function AuthForm({ mode, onToggle }: AuthFormProps) {
           </form>
 
           {/* Toggle */}
-          <div className="mt-8 text-center">
+          <div className={`mt-8 text-center transition-all duration-300 ${isTransitioning ? 'translate-y-2 opacity-0' : 'translate-y-0 opacity-100'}`}>
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200 dark:border-gray-600"></div>
@@ -138,8 +147,9 @@ export function AuthForm({ mode, onToggle }: AuthFormProps) {
             
             <button
               type="button"
-              onClick={onToggle}
-              className="mt-4 group inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition-all duration-200 hover:gap-3"
+              onClick={handleToggle}
+              disabled={isTransitioning}
+              className="mt-4 group inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition-all duration-200 hover:gap-3 disabled:opacity-50"
             >
               {mode === 'signin' 
                 ? 'アカウントをお持ちでない方はこちら' 
