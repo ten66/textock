@@ -1,13 +1,25 @@
-import { useState, useEffect } from 'react';
-import { Template } from '../types';
+import { useState, useEffect, useCallback } from 'react';
+import { Template, TemplateCreateData } from '../types';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { extractVariables } from '../lib/templateUtils';
 
-export function useTemplates() {
+interface UseTemplatesProps {
+  user: User | null;
+  authLoading: boolean;
+}
+
+export function useTemplates({ user, authLoading }: UseTemplatesProps) {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchTemplates = async () => {
+  const fetchTemplates = useCallback(async () => {
+    if (!user) {
+      setTemplates([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('templates')
@@ -18,16 +30,21 @@ export function useTemplates() {
       setTemplates(data || []);
     } catch (error) {
       console.error('テンプレートの取得エラー:', error);
+      setTemplates([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+    
     fetchTemplates();
-  }, []);
+  }, [user, authLoading, fetchTemplates]);
 
-  const createTemplate = async (templateInput: any) => {
+  const createTemplate = async (templateInput: TemplateCreateData) => {
     try {
       if (!templateInput.title?.trim()) {
         throw new Error('タイトルが必須です');
@@ -71,7 +88,7 @@ export function useTemplates() {
     }
   };
 
-  const updateTemplate = async (id: string, updates: any) => {
+  const updateTemplate = async (id: string, updates: Partial<TemplateCreateData>) => {
     try {
       if (updates.content) {
         updates.variables = extractVariables(updates.content);

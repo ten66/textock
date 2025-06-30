@@ -30,3 +30,20 @@ export interface TemplateUsage {
   variables: Record<string, string>;
   result: string;
 }
+
+export interface TemplateFormData {
+  title: string;
+  content: string;
+  description?: string;
+  category?: string;
+  tags?: string;
+}
+
+export interface TemplateCreateData {
+  title: string;
+  content: string;
+  description?: string;
+  category?: string;
+  tags: string[];
+  is_public: boolean;
+}
