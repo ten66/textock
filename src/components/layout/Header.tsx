@@ -1,22 +1,25 @@
-import { User, LogOut, Plus, Search, Moon, Sun } from "lucide-react";
+import { User, LogOut, Search, Moon, Sun } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import { CompactTemplateStatus } from "../ui/CompactTemplateStatus";
 import { useAuth } from "../../hooks/useAuth";
 
 interface HeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  onCreateTemplate: () => void;
   isDark: boolean;
   onToggleDarkMode: () => void;
+  templateCount: number;
+  templateLimit: number;
 }
 
 export function Header({
   searchQuery,
   onSearchChange,
-  onCreateTemplate,
   isDark,
   onToggleDarkMode,
+  templateCount,
+  templateLimit,
 }: HeaderProps) {
   const { user, signOut } = useAuth();
 
@@ -70,9 +73,10 @@ export function Header({
               className="p-2"
             />
 
-            <Button icon={Plus} onClick={onCreateTemplate}>
-              新しいテンプレート
-            </Button>
+            <CompactTemplateStatus 
+              current={templateCount}
+              limit={templateLimit}
+            />
 
             <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <User size={16} className="text-gray-600 dark:text-gray-400" />

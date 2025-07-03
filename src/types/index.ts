@@ -45,5 +45,6 @@ export interface TemplateCreateData {
   description?: string;
   category?: string;
   tags: string[];
+  variables?: VariableDefinition[];
   is_public: boolean;
 }

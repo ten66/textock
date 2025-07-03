@@ -3,6 +3,7 @@ import { Template, TemplateCreateData } from '../types';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { extractVariables } from '../lib/templateUtils';
+import { getCurrentTemplateLimit } from '../lib/constants';
 
 interface UseTemplatesProps {
   user: User | null;
@@ -57,6 +58,12 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) {
         throw new Error('ユーザーが認証されていません');
+      }
+
+      // テンプレート数制限チェック
+      const templateLimit = getCurrentTemplateLimit();
+      if (templates.length >= templateLimit) {
+        throw new Error(`テンプレート数が上限（${templateLimit}個）に達しています。新しいテンプレートを作成するには、既存のテンプレートを削除してください。`);
       }
 
       const variables = extractVariables(templateInput.content);
@@ -128,6 +135,9 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
     }
   };
 
+  const templateLimit = getCurrentTemplateLimit();
+  const isTemplateCountLimitReached = templates.length >= templateLimit;
+
   return {
     templates,
     loading,
@@ -135,5 +145,8 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
     updateTemplate,
     deleteTemplate,
     refetch: fetchTemplates,
+    templateLimit,
+    isTemplateCountLimitReached,
+    templateCount: templates.length,
   };
 }

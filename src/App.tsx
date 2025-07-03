@@ -10,7 +10,7 @@ import { useAuth } from "./hooks/useAuth";
 import { useTemplates } from "./hooks/useTemplates";
 import { useDarkMode } from "./hooks/useDarkMode";
 import { Template, TemplateFormData } from "./types";
-import { FileText, Sparkles, Folder, Filter } from "lucide-react";
+import { FileText, Sparkles, Folder, Filter, Plus } from "lucide-react";
 
 function App() {
   const { user, loading: authLoading } = useAuth();
@@ -20,6 +20,9 @@ function App() {
     createTemplate,
     updateTemplate,
     deleteTemplate,
+    templateLimit,
+    isTemplateCountLimitReached,
+    templateCount,
   } = useTemplates({ user, authLoading });
   const { isDark, toggleDarkMode } = useDarkMode();
 
@@ -71,6 +74,10 @@ function App() {
   }, [filteredTemplates, categories, selectedCategory]);
 
   const handleCreateTemplate = () => {
+    if (isTemplateCountLimitReached) {
+      alert(`テンプレート数が上限（${templateLimit}個）に達しています。\n新しいテンプレートを作成するには、既存のテンプレートを削除してください。`);
+      return;
+    }
     setEditingTemplate(null);
     setShowTemplateForm(true);
   };
@@ -117,7 +124,7 @@ function App() {
       }
 
       if (result.error) {
-        alert("エラーが発生しました: ");
+        alert("エラーが発生しました: " + (result.error instanceof Error ? result.error.message : String(result.error)));
         return;
       }
 
@@ -160,9 +167,10 @@ function App() {
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onCreateTemplate={handleCreateTemplate}
         isDark={isDark}
         onToggleDarkMode={toggleDarkMode}
+        templateCount={templateCount}
+        templateLimit={templateLimit}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -190,12 +198,13 @@ function App() {
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto text-lg">
               {templates.length === 0
-                ? "最初のテンプレートを作成して、プロンプトやテキストスニペットの整理を始めましょう。"
+                ? `最初のテンプレートを作成して、プロンプトやテキストスニペットの整理を始めましょう。最大${templateLimit}個まで作成できます。`
                 : "検索条件やカテゴリフィルターを調整して、お探しのテンプレートを見つけてください。"}
             </p>
             {templates.length === 0 && (
               <Button
                 onClick={handleCreateTemplate}
+                disabled={isTemplateCountLimitReached}
                 icon={Sparkles}
                 size="lg"
                 variant="gradient"
@@ -208,7 +217,7 @@ function App() {
           <div>
             {/* Header with filters */}
             <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                     テンプレート一覧
@@ -218,26 +227,38 @@ function App() {
                   </p>
                 </div>
 
-                {categories.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <Filter
-                      size={16}
-                      className="text-gray-500 dark:text-gray-400"
-                    />
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="all">すべてのカテゴリ</option>
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                <div className="flex items-center gap-3">
+                  <Button
+                    icon={Plus}
+                    onClick={handleCreateTemplate}
+                    disabled={isTemplateCountLimitReached}
+                    variant="gradient"
+                    size="md"
+                  >
+                    新しいテンプレート
+                  </Button>
+
+                  {categories.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Filter
+                        size={16}
+                        className="text-gray-500 dark:text-gray-400"
+                      />
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="all">すべてのカテゴリ</option>
+                        {categories.map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
