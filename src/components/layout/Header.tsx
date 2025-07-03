@@ -1,8 +1,7 @@
-import React from 'react';
-import { User, LogOut, Plus, Search, Moon, Sun } from 'lucide-react';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { useAuth } from '../../hooks/useAuth';
+import { User, LogOut, Plus, Search, Moon, Sun } from "lucide-react";
+import { Button } from "../ui/Button";
+import { Input } from "../ui/Input";
+import { useAuth } from "../../hooks/useAuth";
 
 interface HeaderProps {
   searchQuery: string;
@@ -12,11 +11,17 @@ interface HeaderProps {
   onToggleDarkMode: () => void;
 }
 
-export function Header({ searchQuery, onSearchChange, onCreateTemplate, isDark, onToggleDarkMode }: HeaderProps) {
+export function Header({
+  searchQuery,
+  onSearchChange,
+  onCreateTemplate,
+  isDark,
+  onToggleDarkMode,
+}: HeaderProps) {
   const { user, signOut } = useAuth();
 
   const handleSignOut = async () => {
-    if (window.confirm('ログアウトしてもよろしいですか？')) {
+    if (window.confirm("ログアウトしてもよろしいですか？")) {
       await signOut();
     }
   };
@@ -31,15 +36,22 @@ export function Header({ searchQuery, onSearchChange, onCreateTemplate, isDark, 
                 <span className="text-xl font-bold text-white">T</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Textock</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">テンプレート管理</p>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  Textock
+                </h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Text ✖️ Stock = テンプレート管理
+                </p>
               </div>
             </div>
           </div>
 
           <div className="flex-1 max-w-md mx-8">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={16} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                size={16}
+              />
               <Input
                 placeholder="テンプレートを検索..."
                 value={searchQuery}
@@ -57,17 +69,16 @@ export function Header({ searchQuery, onSearchChange, onCreateTemplate, isDark, 
               onClick={onToggleDarkMode}
               className="p-2"
             />
-            
-            <Button
-              icon={Plus}
-              onClick={onCreateTemplate}
-            >
+
+            <Button icon={Plus} onClick={onCreateTemplate}>
               新しいテンプレート
             </Button>
-            
+
             <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <User size={16} className="text-gray-600 dark:text-gray-400" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">{user?.email}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                {user?.email}
+              </span>
               <Button
                 size="sm"
                 variant="ghost"
