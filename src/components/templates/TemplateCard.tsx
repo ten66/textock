@@ -1,8 +1,7 @@
-import React from 'react';
-import { Template } from '../../types';
-import { Card, CardContent } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Edit, Trash2, Play, Tag, Calendar, FileText } from 'lucide-react';
+import { Template } from "../../types";
+import { Card, CardContent } from "../ui/Card";
+import { Button } from "../ui/Button";
+import { Edit, Trash2, Tag, Calendar, FileText } from "lucide-react";
 
 interface TemplateCardProps {
   template: Template;
@@ -11,21 +10,32 @@ interface TemplateCardProps {
   onUse: (template: Template) => void;
 }
 
-export function TemplateCard({ template, onEdit, onDelete, onUse }: TemplateCardProps) {
+export function TemplateCard({
+  template,
+  onEdit,
+  onDelete,
+  onUse,
+}: TemplateCardProps) {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ja-JP', {
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("ja-JP", {
+      month: "short",
+      day: "numeric",
     });
   };
 
   return (
-    <Card hover className="group bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg hover:shadow-blue-100/50 dark:hover:shadow-blue-900/20 h-full">
+    <Card
+      hover
+      className="group bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg hover:shadow-blue-100/50 dark:hover:shadow-blue-900/20 h-full"
+    >
       <CardContent className="p-4 h-full flex flex-col">
         {/* Compact Header */}
         <div className="mb-3">
           <div className="flex items-center gap-2 mb-1">
-            <FileText size={16} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <FileText
+              size={16}
+              className="text-blue-600 dark:text-blue-400 flex-shrink-0"
+            />
             <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
               {template.title}
             </h3>
