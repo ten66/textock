@@ -76,7 +76,8 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
         tags: Array.isArray(templateInput.tags) ? templateInput.tags : [],
         variables,
         user_id: user.id,
-        is_public: false
+        is_public: false,
+        is_markdown: templateInput.isMarkdown || false
       };
 
       const { data, error } = await supabase

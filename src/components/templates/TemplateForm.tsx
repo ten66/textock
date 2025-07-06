@@ -3,6 +3,7 @@ import { Template } from '../../types';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
+import { MarkdownEditor } from '../ui/MarkdownEditor';
 import { extractVariables, validateTemplate } from '../../lib/templateUtils';
 
 interface TemplateFormData {
@@ -11,6 +12,7 @@ interface TemplateFormData {
   description: string;
   category: string;
   tags: string;
+  isMarkdown?: boolean;
 }
 
 interface TemplateFormProps {
@@ -27,6 +29,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
     description: '',
     category: '一般',
     tags: '',
+    isMarkdown: false,
   });
 
   const [errors, setErrors] = useState<Partial<TemplateFormData>>({});
@@ -40,6 +43,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         description: template.description,
         category: template.category,
         tags: template.tags.join(', '),
+        isMarkdown: template.isMarkdown || false,
       });
     } else {
       setFormData({
@@ -48,6 +52,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         description: '',
         category: '一般',
         tags: '',
+        isMarkdown: false,
       });
     }
     setErrors({});
@@ -70,7 +75,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
   const handleFieldChange = (field: keyof TemplateFormData, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: field === 'isMarkdown' ? value === 'true' : value
     }));
 
     if (errors[field]) {
@@ -116,6 +121,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         description: formData.description.trim(),
         category: formData.category.trim() || '一般',
         tags: formData.tags.trim(),
+        isMarkdown: formData.isMarkdown,
       };
 
       await onSubmit(cleanData);
@@ -160,16 +166,44 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         onChange={(e) => handleFieldChange('description', e.target.value)}
       />
 
-      <Textarea
-        label="テンプレート内容"
-        placeholder="テンプレートをここに書いてください。変数には{{変数名}}の形式を使用してください..."
-        rows={10}
-        value={formData.content}
-        onChange={(e) => handleFieldChange('content', e.target.value)}
-        error={errors.content}
-        helper="{{変数名}}の形式で動的な変数を作成できます"
-        required
-      />
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            テンプレート内容 <span className="text-red-500">*</span>
+          </label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="markdown-toggle"
+              checked={formData.isMarkdown}
+              onChange={(e) => handleFieldChange('isMarkdown', e.target.checked.toString())}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            />
+            <label htmlFor="markdown-toggle" className="text-sm text-gray-700 dark:text-gray-300">
+              マークダウン形式
+            </label>
+          </div>
+        </div>
+        
+        {formData.isMarkdown ? (
+          <MarkdownEditor
+            value={formData.content}
+            onChange={(value) => handleFieldChange('content', value)}
+            placeholder="マークダウンでテンプレートを記述してください。変数には{{変数名}}の形式を使用してください..."
+            autoFocus
+          />
+        ) : (
+          <Textarea
+            placeholder="テンプレートをここに書いてください。変数には{{変数名}}の形式を使用してください..."
+            rows={10}
+            value={formData.content}
+            onChange={(e) => handleFieldChange('content', e.target.value)}
+            error={errors.content}
+            helper="{{変数名}}の形式で動的な変数を作成できます"
+            required
+          />
+        )}
+      </div>
 
       {formData.content.trim().length > 0 && !validation.isValid && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
