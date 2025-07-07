@@ -58,18 +58,18 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   }, [value, onChange]);
 
   const toolbarButtons = [
-    { icon: Heading1, action: () => insertAtCursor('# ', '', 'ヘッダー1'), tooltip: 'ヘッダー1' },
-    { icon: Heading2, action: () => insertAtCursor('## ', '', 'ヘッダー2'), tooltip: 'ヘッダー2' },
-    { icon: Heading3, action: () => insertAtCursor('### ', '', 'ヘッダー3'), tooltip: 'ヘッダー3' },
-    { icon: Bold, action: () => insertAtCursor('**', '**', '太字'), tooltip: '太字' },
-    { icon: Italic, action: () => insertAtCursor('*', '*', '斜体'), tooltip: '斜体' },
-    { icon: Code, action: () => insertAtCursor('`', '`', 'コード'), tooltip: 'インラインコード' },
-    { icon: Code2, action: () => insertAtCursor('```\n', '\n```', 'コードブロック'), tooltip: 'コードブロック' },
-    { icon: Link, action: () => insertAtCursor('[', '](https://example.com)', 'リンクテキスト'), tooltip: 'リンク' },
-    { icon: List, action: () => insertAtCursor('- ', '', 'リスト項目'), tooltip: 'リスト' },
-    { icon: ListOrdered, action: () => insertAtCursor('1. ', '', 'リスト項目'), tooltip: '番号付きリスト' },
-    { icon: Quote, action: () => insertAtCursor('> ', '', '引用'), tooltip: '引用' },
-    { icon: Table, action: () => insertAtCursor('| ヘッダー1 | ヘッダー2 |\n| --- | --- |\n| ', ' | セル2 |', 'セル1'), tooltip: 'テーブル' },
+    { icon: Heading1, action: () => insertAtCursor('# ', '', ''), tooltip: 'ヘッダー1' },
+    { icon: Heading2, action: () => insertAtCursor('## ', '', ''), tooltip: 'ヘッダー2' },
+    { icon: Heading3, action: () => insertAtCursor('### ', '', ''), tooltip: 'ヘッダー3' },
+    { icon: Bold, action: () => insertAtCursor('**', '**', ''), tooltip: '太字' },
+    { icon: Italic, action: () => insertAtCursor('*', '*', ''), tooltip: '斜体' },
+    { icon: Code, action: () => insertAtCursor('`', '`', ''), tooltip: 'インラインコード' },
+    { icon: Code2, action: () => insertAtCursor('```\n', '\n```', ''), tooltip: 'コードブロック' },
+    { icon: Link, action: () => insertAtCursor('[', '](https://example.com)', ''), tooltip: 'リンク' },
+    { icon: List, action: () => insertAtCursor('- ', '', ''), tooltip: 'リスト' },
+    { icon: ListOrdered, action: () => insertAtCursor('1. ', '', ''), tooltip: '番号付きリスト' },
+    { icon: Quote, action: () => insertAtCursor('> ', '', ''), tooltip: '引用' },
+    { icon: Table, action: () => insertAtCursor('|  |  |\n| --- | --- |\n| ', ' |  |', ''), tooltip: 'テーブル' },
     { icon: Minus, action: () => insertAtCursor('---\n', '', ''), tooltip: '水平線' },
   ];
 
