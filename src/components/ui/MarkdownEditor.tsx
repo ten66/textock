@@ -12,7 +12,6 @@ import {
   Heading3,
   Edit3,
   Eye,
-  Image,
   Table,
   Minus,
   Code2
@@ -65,7 +64,6 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     { icon: Code, action: () => insertAtCursor('`', '`', 'コード'), tooltip: 'インラインコード' },
     { icon: Code2, action: () => insertAtCursor('```\n', '\n```', 'コードブロック'), tooltip: 'コードブロック' },
     { icon: Link, action: () => insertAtCursor('[', '](https://example.com)', 'リンクテキスト'), tooltip: 'リンク' },
-    { icon: Image, action: () => insertAtCursor('![', '](https://example.com/image.jpg)', 'alt text'), tooltip: '画像' },
     { icon: List, action: () => insertAtCursor('- ', '', 'リスト項目'), tooltip: 'リスト' },
     { icon: ListOrdered, action: () => insertAtCursor('1. ', '', 'リスト項目'), tooltip: '番号付きリスト' },
     { icon: Quote, action: () => insertAtCursor('> ', '', '引用'), tooltip: '引用' },

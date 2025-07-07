@@ -9,8 +9,6 @@ interface MarkdownComponentProps {
   className?: string;
   inline?: boolean;
   href?: string;
-  src?: string;
-  alt?: string;
 }
 
 interface MarkdownPreviewProps {
@@ -108,14 +106,6 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, class
             >
               {children}
             </a>
-          ),
-          img: ({ src, alt }: MarkdownComponentProps) => (
-            <img
-              src={src}
-              alt={alt}
-              className="max-w-full h-auto rounded-lg shadow-sm mb-4"
-              loading="lazy"
-            />
           ),
           hr: () => (
             <hr className="border-0 border-t border-gray-300 dark:border-gray-600 my-8" />
