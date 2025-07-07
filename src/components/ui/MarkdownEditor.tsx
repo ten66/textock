@@ -10,8 +10,8 @@ import {
   Heading1, 
   Heading2, 
   Heading3,
+  Edit3,
   Eye,
-  EyeOff,
   Image,
   Table,
   Minus,
@@ -34,11 +34,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   className = '',
   autoFocus = false
 }) => {
-  const [showPreview, setShowPreview] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [splitPosition, setSplitPosition] = useState(50);
+  const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
 
   const insertAtCursor = useCallback((before: string, after: string = '', placeholder: string = '') => {
     const textarea = textareaRef.current;
@@ -76,34 +73,6 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     { icon: Minus, action: () => insertAtCursor('---\n', '', ''), tooltip: '水平線' },
   ];
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!showPreview) return;
-    setIsDragging(true);
-    e.preventDefault();
-  };
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !editorRef.current) return;
-    
-    const rect = editorRef.current.getBoundingClientRect();
-    const newPosition = ((e.clientX - rect.left) / rect.width) * 100;
-    setSplitPosition(Math.max(20, Math.min(80, newPosition)));
-  }, [isDragging]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   useEffect(() => {
     if (autoFocus && textareaRef.current) {
@@ -113,36 +82,53 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
   return (
     <div className={`border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden ${className}`}>
-      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600">
-        <div className="flex items-center space-x-1">
-          {toolbarButtons.map((button, index) => (
-            <button
-              key={index}
-              onClick={button.action}
-              className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              title={button.tooltip}
-              type="button"
-            >
-              <button.icon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            </button>
-          ))}
-        </div>
+      {/* Toolbar */}
+      <div className="flex items-center space-x-1 p-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600">
+        {toolbarButtons.map((button, index) => (
+          <button
+            key={index}
+            onClick={button.action}
+            className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            title={button.tooltip}
+            type="button"
+            disabled={activeTab === 'preview'}
+          >
+            <button.icon className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Bar */}
+      <div className="flex border-b border-gray-300 dark:border-gray-600">
         <button
-          onClick={() => setShowPreview(!showPreview)}
-          className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+          onClick={() => setActiveTab('edit')}
+          className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'edit'
+              ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-b-2 border-blue-500'
+              : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+          }`}
           type="button"
         >
-          {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          <span>{showPreview ? 'エディタ' : 'プレビュー'}</span>
+          <Edit3 className="w-4 h-4" />
+          <span>編集</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('preview')}
+          className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'preview'
+              ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-b-2 border-blue-500'
+              : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+          }`}
+          type="button"
+        >
+          <Eye className="w-4 h-4" />
+          <span>プレビュー</span>
         </button>
       </div>
 
-      <div 
-        ref={editorRef}
-        className="relative flex h-96"
-        style={{ cursor: isDragging ? 'col-resize' : 'default' }}
-      >
-        {!showPreview ? (
+      {/* Content Area */}
+      <div className="h-80">
+        {activeTab === 'edit' ? (
           <textarea
             ref={textareaRef}
             value={value}
@@ -152,35 +138,9 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}
           />
         ) : (
-          <>
-            <div 
-              className="border-r border-gray-300 dark:border-gray-600 overflow-hidden"
-              style={{ width: `${splitPosition}%` }}
-            >
-              <textarea
-                ref={textareaRef}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
-                className="w-full h-full p-4 text-sm font-mono border-0 outline-none resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-                style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}
-              />
-            </div>
-            
-            <div 
-              className="w-1 bg-gray-300 dark:bg-gray-600 cursor-col-resize hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-              onMouseDown={handleMouseDown}
-            />
-            
-            <div 
-              className="overflow-auto bg-white dark:bg-gray-900"
-              style={{ width: `${100 - splitPosition}%` }}
-            >
-              <div className="p-4">
-                <MarkdownPreview content={value} />
-              </div>
-            </div>
-          </>
+          <div className="h-full overflow-auto bg-white dark:bg-gray-900 p-4">
+            <MarkdownPreview content={value} />
+          </div>
         )}
       </div>
     </div>

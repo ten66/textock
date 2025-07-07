@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { MarkdownEditor } from '../ui/MarkdownEditor';
+import { Toggle } from '../ui/Toggle';
 import { extractVariables, validateTemplate } from '../../lib/templateUtils';
 
 interface TemplateFormData {
@@ -171,18 +172,11 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             テンプレート内容 <span className="text-red-500">*</span>
           </label>
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="markdown-toggle"
-              checked={formData.isMarkdown}
-              onChange={(e) => handleFieldChange('isMarkdown', e.target.checked.toString())}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-            <label htmlFor="markdown-toggle" className="text-sm text-gray-700 dark:text-gray-300">
-              マークダウン形式
-            </label>
-          </div>
+          <Toggle
+            checked={formData.isMarkdown}
+            onChange={(checked) => handleFieldChange('isMarkdown', checked.toString())}
+            label="マークダウン形式"
+          />
         </div>
         
         {formData.isMarkdown ? (
