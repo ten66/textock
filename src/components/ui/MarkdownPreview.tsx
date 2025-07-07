@@ -16,12 +16,51 @@ interface MarkdownPreviewProps {
   className?: string;
 }
 
+const VariableSpan: React.FC<{ variable: string }> = ({ variable }) => (
+  <span className="inline-block px-2 py-1 mx-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-md border border-blue-200 dark:border-blue-700">
+    {`{{${variable}}}`}
+  </span>
+);
+
 export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, className = '' }) => {
-  const processedContent = useMemo(() => {
-    return content.replace(/\{\{([^}]+)\}\}/g, (match, variable) => {
-      return `<span class="inline-block px-2 py-1 mx-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-md border border-blue-200 dark:border-blue-700">{{${variable}}}</span>`;
-    });
-  }, [content]);
+  const processTextNode = (text: string): React.ReactNode[] => {
+    const parts: React.ReactNode[] = [];
+    const regex = /\{\{([^}]+)\}\}/g;
+    let lastIndex = 0;
+    let match;
+    let keyIndex = 0;
+
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+      parts.push(<VariableSpan key={`var-${keyIndex++}`} variable={match[1]} />);
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : [text];
+  };
+
+  const processChildren = (children: React.ReactNode): React.ReactNode => {
+    if (typeof children === 'string') {
+      const processed = processTextNode(children);
+      return processed.length === 1 ? processed[0] : processed;
+    }
+    
+    if (Array.isArray(children)) {
+      return children.map((child, index) => 
+        typeof child === 'string' 
+          ? <span key={index}>{processTextNode(child)}</span>
+          : child
+      );
+    }
+    
+    return children;
+  };
 
   return (
     <div className={`prose prose-sm max-w-none dark:prose-invert ${className}`}>
@@ -31,22 +70,22 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, class
         components={{
           h1: ({ children }: MarkdownComponentProps) => (
             <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-              {children}
+              {processChildren(children)}
             </h1>
           ),
           h2: ({ children }: MarkdownComponentProps) => (
             <h2 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-1">
-              {children}
+              {processChildren(children)}
             </h2>
           ),
           h3: ({ children }: MarkdownComponentProps) => (
             <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-white">
-              {children}
+              {processChildren(children)}
             </h3>
           ),
           p: ({ children }: MarkdownComponentProps) => (
             <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-              {children}
+              {processChildren(children)}
             </p>
           ),
           ul: ({ children }: MarkdownComponentProps) => (
@@ -60,11 +99,11 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, class
             </ol>
           ),
           li: ({ children }: MarkdownComponentProps) => (
-            <li className="mb-1">{children}</li>
+            <li className="mb-1">{processChildren(children)}</li>
           ),
           blockquote: ({ children }: MarkdownComponentProps) => (
             <blockquote className="border-l-4 border-blue-500 pl-4 py-2 mb-4 bg-blue-50 dark:bg-blue-900/20 text-gray-700 dark:text-gray-300 italic">
-              {children}
+              {processChildren(children)}
             </blockquote>
           ),
           code: ({ inline, className, children }: MarkdownComponentProps) => {
@@ -89,12 +128,12 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, class
           ),
           th: ({ children }: MarkdownComponentProps) => (
             <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-left font-semibold text-gray-900 dark:text-white">
-              {children}
+              {processChildren(children)}
             </th>
           ),
           td: ({ children }: MarkdownComponentProps) => (
             <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-700 dark:text-gray-300">
-              {children}
+              {processChildren(children)}
             </td>
           ),
           a: ({ href, children }: MarkdownComponentProps) => (
@@ -104,7 +143,7 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, class
               target="_blank"
               rel="noopener noreferrer"
             >
-              {children}
+              {processChildren(children)}
             </a>
           ),
           hr: () => (
@@ -112,7 +151,7 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, class
           ),
         }}
       >
-        {processedContent}
+        {content}
       </ReactMarkdown>
     </div>
   );
