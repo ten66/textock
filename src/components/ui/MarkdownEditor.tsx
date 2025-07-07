@@ -42,6 +42,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
+    const scrollTop = textarea.scrollTop;
     const selectedText = value.substring(start, end);
     const replacement = selectedText || placeholder;
     const newText = value.substring(0, start) + before + replacement + after + value.substring(end);
@@ -52,6 +53,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       textarea.focus();
       const newCursorPos = start + before.length + replacement.length;
       textarea.setSelectionRange(newCursorPos, newCursorPos);
+      textarea.scrollTop = scrollTop;
     }, 0);
   }, [value, onChange]);
 
