@@ -132,14 +132,25 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
         updates.variables = extractVariables(updates.content);
       }
 
+      // データの前処理：不要なプロパティを削除
+      const cleanUpdates = { ...updates };
+      if (cleanUpdates.isMarkdown !== undefined) {
+        delete cleanUpdates.isMarkdown;
+      }
+
       const { data, error } = await supabase
         .from('templates')
-        .update(updates)
+        .update(cleanUpdates)
         .eq('id', id)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase更新エラー:', error);
+        console.error('更新データ:', cleanUpdates);
+        console.error('テンプレートID:', id);
+        throw error;
+      }
       
       setTemplates(prev => prev.map(t => t.id === id ? data : t));
       return { data, error: null };

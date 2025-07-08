@@ -107,17 +107,20 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, class
           ),
           code: ({ inline, className, children }: MarkdownComponentProps) => {
             return !inline ? (
-              <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto mb-4">
-                <code className={className}>
-                  {children}
-                </code>
-              </pre>
+              <code className={`block bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto mb-4 font-mono text-sm ${className}`}>
+                {children}
+              </code>
             ) : (
               <code className="px-2 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded font-mono">
                 {children}
               </code>
             );
           },
+          pre: ({ children }: MarkdownComponentProps) => (
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto mb-4">
+              {children}
+            </div>
+          ),
           table: ({ children }: MarkdownComponentProps) => (
             <div className="overflow-x-auto mb-4">
               <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
