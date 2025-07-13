@@ -27,7 +27,6 @@ export function useAuth() {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
         setUser(session?.user ?? null);
         setLoading(false);
       }
@@ -46,7 +45,6 @@ export function useAuth() {
         }
       });
       
-      console.log('Sign up result:', { data, error });
       return { data, error };
     } catch (error) {
       console.error('Sign up error:', error);
@@ -61,7 +59,6 @@ export function useAuth() {
         password,
       });
       
-      console.log('Sign in result:', { data, error });
       return { data, error };
     } catch (error) {
       console.error('Sign in error:', error);

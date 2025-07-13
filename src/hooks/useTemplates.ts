@@ -81,7 +81,6 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
         is_markdown: templateInput.isMarkdown || false
       };
 
-      console.log('Attempting to insert template with data:', templateData);
       
       let { data, error } = await supabase
         .from('templates')
@@ -91,7 +90,6 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
 
       // If error occurs and might be related to is_markdown column, retry without it
       if (error && (error.message?.includes('is_markdown') || error.code === '42703')) {
-        console.warn('Retrying without is_markdown field due to error:', error);
         
         // Remove is_markdown field and retry
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -108,13 +106,6 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
       }
 
       if (error) {
-        console.error('Supabase insert error:', error);
-        console.error('Error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
         throw error;
       }
       
@@ -146,9 +137,6 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
         .single();
 
       if (error) {
-        console.error('Supabase更新エラー:', error);
-        console.error('更新データ:', cleanUpdates);
-        console.error('テンプレートID:', id);
         throw error;
       }
       
