@@ -68,7 +68,8 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
 
       const variables = extractVariables(templateInput.content);
 
-      const templateData = {
+      // First, try with is_markdown field
+      const templateData: Record<string, unknown> = {
         title: templateInput.title.trim(),
         content: templateInput.content.trim(),
         description: templateInput.description?.trim() || '',
@@ -76,16 +77,37 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
         tags: Array.isArray(templateInput.tags) ? templateInput.tags : [],
         variables,
         user_id: user.id,
-        is_public: false
+        is_public: false,
+        is_markdown: templateInput.isMarkdown || false
       };
 
-      const { data, error } = await supabase
+      
+      let { data, error } = await supabase
         .from('templates')
         .insert([templateData])
         .select()
         .single();
 
-      if (error) throw error;
+      // If error occurs and might be related to is_markdown column, retry without it
+      if (error && (error.message?.includes('is_markdown') || error.code === '42703')) {
+        
+        // Remove is_markdown field and retry
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { is_markdown: _, ...templateDataWithoutMarkdown } = templateData;
+        
+        const retryResult = await supabase
+          .from('templates')
+          .insert([templateDataWithoutMarkdown])
+          .select()
+          .single();
+          
+        data = retryResult.data;
+        error = retryResult.error;
+      }
+
+      if (error) {
+        throw error;
+      }
       
       setTemplates(prev => [data, ...prev]);
       return { data, error: null };
@@ -101,14 +123,22 @@ export function useTemplates({ user, authLoading }: UseTemplatesProps) {
         updates.variables = extractVariables(updates.content);
       }
 
+      // データの前処理：不要なプロパティを削除
+      const cleanUpdates = { ...updates };
+      if (cleanUpdates.isMarkdown !== undefined) {
+        delete cleanUpdates.isMarkdown;
+      }
+
       const { data, error } = await supabase
         .from('templates')
-        .update(updates)
+        .update(cleanUpdates)
         .eq('id', id)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       
       setTemplates(prev => prev.map(t => t.id === id ? data : t));
       return { data, error: null };

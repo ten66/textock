@@ -1,8 +1,10 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { Template } from '../../types';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
+import { MarkdownEditor } from '../ui/MarkdownEditor';
+import { Toggle } from '../ui/Toggle';
 import { extractVariables, validateTemplate } from '../../lib/templateUtils';
 
 interface TemplateFormData {
@@ -11,6 +13,7 @@ interface TemplateFormData {
   description: string;
   category: string;
   tags: string;
+  isMarkdown?: boolean;
 }
 
 interface TemplateFormProps {
@@ -27,10 +30,13 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
     description: '',
     category: '一般',
     tags: '',
+    isMarkdown: false,
   });
 
   const [errors, setErrors] = useState<Partial<TemplateFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [debouncedContent, setDebouncedContent] = useState(formData.content);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (template) {
@@ -40,6 +46,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         description: template.description,
         category: template.category,
         tags: template.tags.join(', '),
+        isMarkdown: template.isMarkdown || false,
       });
     } else {
       setFormData({
@@ -48,29 +55,57 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         description: '',
         category: '一般',
         tags: '',
+        isMarkdown: false,
       });
     }
     setErrors({});
+    setDebouncedContent(template?.content || '');
   }, [template]);
 
+  useEffect(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedContent(formData.content);
+    }, 300);
+    
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, [formData.content]);
+
   const variables = useMemo(() => {
-    if (!formData.content || formData.content.trim().length === 0) {
+    if (!debouncedContent || debouncedContent.trim().length === 0) {
       return [];
     }
-    return extractVariables(formData.content);
-  }, [formData.content]);
+    try {
+      return extractVariables(debouncedContent);
+    } catch (error) {
+      console.error('変数抽出エラー:', error);
+      return [];
+    }
+  }, [debouncedContent]);
 
   const validation = useMemo(() => {
-    if (!formData.content || formData.content.trim().length === 0) {
+    if (!debouncedContent || debouncedContent.trim().length === 0) {
       return { isValid: false, errors: ['内容は必須です'] };
     }
-    return validateTemplate(formData.content);
-  }, [formData.content]);
+    try {
+      return validateTemplate(debouncedContent);
+    } catch (error) {
+      console.error('テンプレート検証エラー:', error);
+      return { isValid: false, errors: ['テンプレートの検証中にエラーが発生しました'] };
+    }
+  }, [debouncedContent]);
 
-  const handleFieldChange = (field: keyof TemplateFormData, value: string) => {
+  const handleFieldChange = useCallback((field: keyof TemplateFormData, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: field === 'isMarkdown' ? value === 'true' : value
     }));
 
     if (errors[field]) {
@@ -79,7 +114,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         [field]: undefined
       }));
     }
-  };
+  }, [errors]);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<TemplateFormData> = {};
@@ -92,8 +127,16 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
       newErrors.content = '内容は必須です';
     } else if (formData.content.trim().length < 3) {
       newErrors.content = '内容は3文字以上で入力してください';
-    } else if (!validation.isValid) {
-      newErrors.content = validation.errors.join(', ');
+    } else {
+      try {
+        const immediateValidation = validateTemplate(formData.content);
+        if (!immediateValidation.isValid) {
+          newErrors.content = immediateValidation.errors.join(', ');
+        }
+      } catch (error) {
+        console.error('即座の検証エラー:', error);
+        newErrors.content = 'テンプレートの検証中にエラーが発生しました';
+      }
     }
 
     setErrors(newErrors);
@@ -116,6 +159,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         description: formData.description.trim(),
         category: formData.category.trim() || '一般',
         tags: formData.tags.trim(),
+        isMarkdown: formData.isMarkdown,
       };
 
       await onSubmit(cleanData);
@@ -129,10 +173,19 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
   const isFormValid = useMemo(() => {
     const titleValid = formData.title.trim().length > 0;
     const contentValid = formData.content.trim().length >= 3;
-    const validationPassed = validation.isValid;
     
-    return titleValid && contentValid && validationPassed;
-  }, [formData.title, formData.content, validation.isValid]);
+    if (!titleValid || !contentValid) {
+      return false;
+    }
+    
+    try {
+      const immediateValidation = validateTemplate(formData.content);
+      return immediateValidation.isValid;
+    } catch (error) {
+      console.error('フォーム検証エラー:', error);
+      return false;
+    }
+  }, [formData.title, formData.content]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -160,18 +213,39 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         onChange={(e) => handleFieldChange('description', e.target.value)}
       />
 
-      <Textarea
-        label="テンプレート内容"
-        placeholder="テンプレートをここに書いてください。変数には{{変数名}}の形式を使用してください..."
-        rows={10}
-        value={formData.content}
-        onChange={(e) => handleFieldChange('content', e.target.value)}
-        error={errors.content}
-        helper="{{変数名}}の形式で動的な変数を作成できます"
-        required
-      />
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            テンプレート内容 <span className="text-red-500">*</span>
+          </label>
+          <Toggle
+            checked={formData.isMarkdown}
+            onChange={(checked) => handleFieldChange('isMarkdown', checked.toString())}
+            label="マークダウン形式"
+          />
+        </div>
+        
+        {formData.isMarkdown ? (
+          <MarkdownEditor
+            value={formData.content}
+            onChange={(value) => handleFieldChange('content', value)}
+            placeholder="マークダウンでテンプレートを記述してください。変数には{{変数名}}の形式を使用してください..."
+            autoFocus
+          />
+        ) : (
+          <Textarea
+            placeholder="テンプレートをここに書いてください。変数には{{変数名}}の形式を使用してください..."
+            rows={10}
+            value={formData.content}
+            onChange={(e) => handleFieldChange('content', e.target.value)}
+            error={errors.content}
+            helper="{{変数名}}の形式で動的な変数を作成できます"
+            required
+          />
+        )}
+      </div>
 
-      {formData.content.trim().length > 0 && !validation.isValid && (
+      {debouncedContent.trim().length > 0 && !validation.isValid && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
           <h4 className="text-red-800 dark:text-red-300 font-medium mb-2">⚠️ テンプレート検証エラー:</h4>
           <ul className="text-red-700 dark:text-red-400 text-sm space-y-1">

@@ -114,6 +114,7 @@ function App() {
               .filter(Boolean)
           : [],
         is_public: false,
+        isMarkdown: data.isMarkdown,
       };
 
       let result;

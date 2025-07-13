@@ -10,6 +10,7 @@ export interface Template {
   user_id: string;
   created_at: string;
   updated_at: string;
+  isMarkdown?: boolean;
 }
 
 export interface VariableDefinition {
@@ -47,4 +48,5 @@ export interface TemplateCreateData {
   tags: string[];
   variables?: VariableDefinition[];
   is_public: boolean;
+  isMarkdown?: boolean;
 }

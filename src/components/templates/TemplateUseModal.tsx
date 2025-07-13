@@ -4,8 +4,9 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
+import { MarkdownPreview } from '../ui/MarkdownPreview';
 import { replaceVariables } from '../../lib/templateUtils';
-import { Copy, Download } from 'lucide-react';
+import { Copy, Download, Eye, Code } from 'lucide-react';
 
 interface TemplateUseModalProps {
   template: Template | null;
@@ -16,10 +17,12 @@ interface TemplateUseModalProps {
 export function TemplateUseModal({ template, isOpen, onClose }: TemplateUseModalProps) {
   const [variables, setVariables] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState(false);
+  const [showMarkdownPreview, setShowMarkdownPreview] = useState(false);
 
   if (!template) return null;
 
   const result = replaceVariables(template.content, variables);
+  const isMarkdown = template.isMarkdown || false;
 
   const handleVariableChange = (name: string, value: string) => {
     setVariables(prev => ({ ...prev, [name]: value }));
@@ -36,11 +39,13 @@ export function TemplateUseModal({ template, isOpen, onClose }: TemplateUseModal
   };
 
   const handleDownload = () => {
-    const blob = new Blob([result], { type: 'text/plain' });
+    const fileExtension = isMarkdown ? 'md' : 'txt';
+    const mimeType = isMarkdown ? 'text/markdown' : 'text/plain';
+    const blob = new Blob([result], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${template.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+    a.download = `${template.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${fileExtension}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -50,6 +55,7 @@ export function TemplateUseModal({ template, isOpen, onClose }: TemplateUseModal
   const handleClose = () => {
     setVariables({});
     setCopied(false);
+    setShowMarkdownPreview(false);
     onClose();
   };
 
@@ -82,6 +88,16 @@ export function TemplateUseModal({ template, isOpen, onClose }: TemplateUseModal
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">結果</h3>
             <div className="flex gap-2">
+              {isMarkdown && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  icon={showMarkdownPreview ? Code : Eye}
+                  onClick={() => setShowMarkdownPreview(!showMarkdownPreview)}
+                >
+                  {showMarkdownPreview ? 'ソース' : 'プレビュー'}
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="secondary"
@@ -100,12 +116,19 @@ export function TemplateUseModal({ template, isOpen, onClose }: TemplateUseModal
               </Button>
             </div>
           </div>
-          <Textarea
-            value={result}
-            readOnly
-            rows={12}
-            className="bg-gray-50 dark:bg-gray-700 font-mono text-sm"
-          />
+          
+          {isMarkdown && showMarkdownPreview ? (
+            <div className="max-h-96 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-800">
+              <MarkdownPreview content={result} />
+            </div>
+          ) : (
+            <Textarea
+              value={result}
+              readOnly
+              rows={12}
+              className="bg-gray-50 dark:bg-gray-700 font-mono text-sm"
+            />
+          )}
         </div>
       </div>
     </Modal>

@@ -64,10 +64,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </div>
         )}
         {helper && !error && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
             <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
             {helper}
-          </p>
+          </div>
         )}
       </div>
     );
