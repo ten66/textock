@@ -17,7 +17,7 @@ Textock は、テキストテンプレートの作成・管理・再利用を効
 
 ## 🌐 URL
 
-🌐 **[Textock](https://textock.netlify.app/)**
+🌐 **[Textock](https://textock.vercel.app/)**
 
 ## 🛠️ 技術スタック
 
