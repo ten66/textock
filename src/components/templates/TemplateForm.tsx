@@ -13,7 +13,7 @@ interface TemplateFormData {
   description: string;
   category: string;
   tags: string;
-  isMarkdown?: boolean;
+  isMarkdown: boolean;
 }
 
 interface TemplateFormProps {
