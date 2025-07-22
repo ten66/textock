@@ -188,8 +188,8 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
   }, [formData.title, formData.content]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label="タイトル"
           placeholder="マイテンプレート"
@@ -214,7 +214,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
       />
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             テンプレート内容 <span className="text-red-500">*</span>
           </label>
@@ -235,7 +235,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         ) : (
           <Textarea
             placeholder="テンプレートをここに書いてください。変数には{{変数名}}の形式を使用してください..."
-            rows={10}
+            rows={8}
             value={formData.content}
             onChange={(e) => handleFieldChange('content', e.target.value)}
             error={errors.content}
@@ -246,9 +246,9 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
       </div>
 
       {debouncedContent.trim().length > 0 && !validation.isValid && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-          <h4 className="text-red-800 dark:text-red-300 font-medium mb-2">⚠️ テンプレート検証エラー:</h4>
-          <ul className="text-red-700 dark:text-red-400 text-sm space-y-1">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 sm:p-4">
+          <h4 className="text-red-800 dark:text-red-300 font-medium mb-2 text-sm sm:text-base">⚠️ テンプレート検証エラー:</h4>
+          <ul className="text-red-700 dark:text-red-400 text-xs sm:text-sm space-y-1">
             {validation.errors.map((error, index) => (
               <li key={index} className="flex items-start gap-2">
                 <span className="text-red-500 mt-0.5">•</span>
@@ -260,13 +260,13 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
       )}
 
       {variables.length > 0 && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-          <h4 className="text-blue-800 dark:text-blue-300 font-medium mb-2">✅ 検出された変数 ({variables.length}個):</h4>
-          <div className="flex flex-wrap gap-2">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4">
+          <h4 className="text-blue-800 dark:text-blue-300 font-medium mb-2 text-sm sm:text-base">✅ 検出された変数 ({variables.length}個):</h4>
+          <div className="flex flex-wrap gap-1 sm:gap-2">
             {variables.map((variable) => (
               <span
                 key={variable.name}
-                className="px-3 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-sm rounded-full font-medium"
+                className="px-2 sm:px-3 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs sm:text-sm rounded-full font-medium"
               >
                 {variable.name}
               </span>
@@ -283,12 +283,12 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
         helper="タグはカンマで区切ってください"
       />
 
-      <div className="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <Button
           type="button"
           variant="secondary"
           onClick={onCancel}
-          className="flex-1"
+          className="w-full sm:flex-1 order-2 sm:order-1"
           disabled={isSubmitting || loading}
         >
           キャンセル
@@ -297,7 +297,7 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
           type="submit"
           loading={isSubmitting || loading}
           disabled={!isFormValid || isSubmitting || loading}
-          className="flex-1"
+          className="w-full sm:flex-1 order-1 sm:order-2"
         >
           {template ? 'テンプレートを更新' : 'テンプレートを作成'}
         </Button>

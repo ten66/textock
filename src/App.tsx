@@ -174,7 +174,7 @@ function App() {
         templateLimit={templateLimit}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {templatesLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -217,38 +217,39 @@ function App() {
         ) : (
           <div>
             {/* Header with filters */}
-            <div className="mb-8">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+            <div className="mb-6 sm:mb-8">
+              <div className="flex flex-col gap-4 mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                     テンプレート一覧
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                     {filteredTemplates.length}個のテンプレートが見つかりました
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   <Button
                     icon={Plus}
                     onClick={handleCreateTemplate}
                     disabled={isTemplateCountLimitReached}
                     variant="gradient"
                     size="md"
+                    className="w-full sm:w-auto"
                   >
                     新しいテンプレート
                   </Button>
 
                   {categories.length > 0 && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
                       <Filter
                         size={16}
-                        className="text-gray-500 dark:text-gray-400"
+                        className="text-gray-500 dark:text-gray-400 flex-shrink-0"
                       />
                       <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="flex-1 sm:flex-none px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="all">すべてのカテゴリ</option>
                         {categories.map((category) => (
@@ -286,7 +287,7 @@ function App() {
                       </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                       {categoryTemplates.map((template) => (
                         <TemplateCard
                           key={template.id}

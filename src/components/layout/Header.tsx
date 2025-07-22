@@ -32,7 +32,8 @@ export function Header({
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        {/* Desktop Layout */}
+        <div className="hidden md:flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -91,6 +92,70 @@ export function Header({
                 className="p-1 ml-1"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Mobile Layout */}
+        <div className="md:hidden">
+          {/* Top row - Logo and user controls */}
+          <div className="flex items-center justify-between h-14 pb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-lg font-bold text-white">T</span>
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  Textock
+                </h1>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                icon={isDark ? Sun : Moon}
+                onClick={onToggleDarkMode}
+                className="p-2"
+              />
+
+              <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <User size={14} className="text-gray-600 dark:text-gray-400" />
+                <span className="text-xs text-gray-700 dark:text-gray-300 max-w-20 truncate">
+                  {user?.email?.split('@')[0]}
+                </span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon={LogOut}
+                  onClick={handleSignOut}
+                  className="p-1"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom row - Search and status */}
+          <div className="flex items-center gap-3 pb-3">
+            <div className="flex-1">
+              <div className="relative">
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                  size={16}
+                />
+                <Input
+                  placeholder="検索..."
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  className="pl-10 h-10"
+                />
+              </div>
+            </div>
+            
+            <CompactTemplateStatus 
+              current={templateCount}
+              limit={templateLimit}
+            />
           </div>
         </div>
       </div>

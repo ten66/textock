@@ -188,32 +188,47 @@ export function AuthForm({ mode, onToggle }: AuthFormProps) {
         </div>
 
         {/* Features */}
-        <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-          <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/20 dark:border-gray-700/20">
-            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mx-auto mb-2">
+        <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-4 text-center">
+          <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-2 sm:p-4 border border-white/20 dark:border-gray-700/20">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mx-auto mb-1 sm:mb-2">
+              <Sparkles
+                size={12}
+                className="text-blue-600 dark:text-blue-400 sm:hidden"
+              />
               <Sparkles
                 size={16}
-                className="text-blue-600 dark:text-blue-400"
+                className="text-blue-600 dark:text-blue-400 hidden sm:block"
               />
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
               テンプレート管理
             </p>
           </div>
-          <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/20 dark:border-gray-700/20">
-            <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mx-auto mb-2">
+          <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-2 sm:p-4 border border-white/20 dark:border-gray-700/20">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mx-auto mb-1 sm:mb-2">
+              <Shield
+                size={12}
+                className="text-purple-600 dark:text-purple-400 sm:hidden"
+              />
               <Shield
                 size={16}
-                className="text-purple-600 dark:text-purple-400"
+                className="text-purple-600 dark:text-purple-400 hidden sm:block"
               />
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
               安全なデータ
             </p>
           </div>
-          <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/20 dark:border-gray-700/20">
-            <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <User size={16} className="text-green-600 dark:text-green-400" />
+          <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-2 sm:p-4 border border-white/20 dark:border-gray-700/20">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mx-auto mb-1 sm:mb-2">
+              <User 
+                size={12} 
+                className="text-green-600 dark:text-green-400 sm:hidden" 
+              />
+              <User 
+                size={16} 
+                className="text-green-600 dark:text-green-400 hidden sm:block" 
+              />
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
               個人アカウント
