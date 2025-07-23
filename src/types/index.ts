@@ -38,6 +38,7 @@ export interface TemplateFormData {
   description?: string;
   category?: string;
   tags?: string;
+  isMarkdown?: boolean;
 }
 
 export interface TemplateCreateData {
