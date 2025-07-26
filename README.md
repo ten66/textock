@@ -25,7 +25,3 @@ Textock は、テキストテンプレートの作成・管理・再利用を効
 - Tailwind CSS
 - Supabase (認証・データベース)
 - Vite
-
-## 📄 ライセンス
-
-MIT License
